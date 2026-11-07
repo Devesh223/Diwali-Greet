@@ -94,7 +94,7 @@ $('#btnBegin').onclick = () => begin(true);
 $('#btnQuiet').onclick = () => begin(false);
 $('#btnMute').onclick = (e) => { audio.setMuted(!audio.muted); e.currentTarget.classList.toggle('off', audio.muted); };
 $('#btnSkip').onclick = () => jump(CHAPTERS.length - 1);
-$('#btnReplay').onclick = () => { T = 0; scenes = CHAPTERS.map((c) => c.make(W, H, fx)); cur = -1; capKey = ''; $('#final').classList.remove('on'); };
+$('#btnReplay').onclick = () => { T = 0; scenes = CHAPTERS.map((c) => c.make(W, H, fx)); cur = -1; capKey = ''; $('#final').classList.remove('on'); if (audio.replay) audio.replay(); };
 $('#btnShare').onclick = () => nativeShare(buildLink(TO, FROM), FROM);
 
 // modal
@@ -107,7 +107,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.hidd
 inTo.oninput = inFrom.oninput = refreshModal;
 $('#mCopy').onclick = () => copy(out.value);
 $('#mShare').onclick = () => nativeShare(out.value, clean(inFrom.value));
-document.addEventListener('visibilitychange', () => { if (audio.ctx) document.hidden ? audio.ctx.suspend() : audio.ctx.resume(); last = performance.now(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { audio.pause(); } else { audio.resume(); } last = performance.now(); });
 
 personalise();
 if (params.has('autoplay')) begin(false).then(() => { const s = parseFloat(params.get('t')); if (s) T = s; });

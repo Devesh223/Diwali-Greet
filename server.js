@@ -2,7 +2,7 @@
 // OpenGraph tags so WhatsApp / Instagram link previews show "A Diwali wish for <Name>".
 const http = require('http'), fs = require('fs'), path = require('path'), zlib = require('zlib');
 const PUB = path.join(__dirname, 'public'), PORT = process.env.PORT || 3000;
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.txt': 'text/plain' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.txt': 'text/plain', '.mp3': 'audio/mpeg' };
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clean = (v) => String(v || '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, 24);
 const indexTpl = fs.readFileSync(path.join(PUB, 'index.html'), 'utf8');
@@ -23,10 +23,33 @@ http.createServer((req, res) => {
   }
   const file = path.join(PUB, path.normalize(p));
   if (!file.startsWith(PUB)) { res.writeHead(403); return res.end(); }
-  fs.readFile(file, (err, data) => {
-    if (err) { res.writeHead(404, { 'Content-Type': 'text/plain' }); return res.end('Not found'); }
-    const ext = path.extname(file), h = { 'Content-Type': TYPES[ext] || 'application/octet-stream', 'Cache-Control': ext === '.png' ? 'public, max-age=86400' : 'public, max-age=300' };
-    if (/\.(js|css|html|svg)$/.test(ext) && /gzip/.test(req.headers['accept-encoding'] || '')) { h['Content-Encoding'] = 'gzip'; res.writeHead(200, h); return res.end(zlib.gzipSync(data)); }
-    res.writeHead(200, h); res.end(data);
+  fs.stat(file, (err, stats) => {
+    if (err || !stats.isFile()) { res.writeHead(404, { 'Content-Type': 'text/plain' }); return res.end('Not found'); }
+    const ext = path.extname(file);
+    if (ext === '.mp3') {
+      const range = req.headers.range;
+      if (range) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+        res.writeHead(206, {
+          'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': (end - start) + 1,
+          'Content-Type': 'audio/mpeg'
+        });
+        fs.createReadStream(file, { start, end }).pipe(res);
+        return;
+      }
+      res.writeHead(200, { 'Content-Length': stats.size, 'Content-Type': 'audio/mpeg', 'Accept-Ranges': 'bytes', 'Cache-Control': 'public, max-age=86400' });
+      fs.createReadStream(file).pipe(res);
+      return;
+    }
+    fs.readFile(file, (err, data) => {
+      if (err) { res.writeHead(404, { 'Content-Type': 'text/plain' }); return res.end('Not found'); }
+      const h = { 'Content-Type': TYPES[ext] || 'application/octet-stream', 'Cache-Control': ext === '.png' ? 'public, max-age=86400' : 'public, max-age=300' };
+      if (/\.(js|css|html|svg)$/.test(ext) && /gzip/.test(req.headers['accept-encoding'] || '')) { h['Content-Encoding'] = 'gzip'; res.writeHead(200, h); return res.end(zlib.gzipSync(data)); }
+      res.writeHead(200, h); res.end(data);
+    });
   });
 }).listen(PORT, () => console.log('Journey of Light on :' + PORT));
