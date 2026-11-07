@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<meta name="theme-color" content="#050309">
+<meta property="og:type" content="website">
+<meta property="og:title" content="__TITLE__">
+<meta property="og:description" content="__DESC__">
+<meta property="og:image" content="__ORIGIN__/og.png">
+<meta property="og:url" content="__URL__">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="__ORIGIN__/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%AA%94%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=Jost:wght@300;400;500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="stage" aria-label="Cinematic Diwali animation"></canvas>
+
+<div id="hud" hidden>
+  <div id="chapter"><span id="chRoman"></span><span id="chName"></span></div>
+  <div class="tools">
+    <button id="btnMute" aria-label="Toggle sound" title="Sound">♪</button>
+    <button id="btnSkip" aria-label="Skip to the wish">Skip ›</button>
+  </div>
+</div>
+<p id="caption" aria-live="polite"></p>
+<p id="hint"></p>
+<nav id="chapters" aria-label="Chapters" hidden></nav>
+
+<section id="final" hidden>
+  <p class="eyebrow" id="fTo"></p>
+  <h1 class="deva">शुभ दीपावली</h1>
+  <p class="en">Happy Diwali</p>
+  <p class="wish">May your life always shine with happiness, love and endless possibilities.</p>
+  <p class="from" id="fFrom"></p>
+  <div class="actions">
+    <a class="btn primary" id="btnWa" target="_blank" rel="noopener">Send on WhatsApp</a>
+    <button class="btn" id="btnShare">Share</button>
+    <button class="btn" id="btnPers">Personalise</button>
+    <button class="btn ghost" id="btnReplay">↻ Replay</button>
+  </div>
+  <p class="credit">Made with <span>♥</span> by <a href="https://website-indianpixel.vercel.app/" target="_blank" rel="noopener">Indian Pixel</a> · <em>Turning dreams into design.</em></p>
+</section>
+
+<section id="gate">
+  <div class="gate-in">
+    <div class="gate-diya" aria-hidden="true"><i class="fl"></i><i class="bowl"></i></div>
+    <p class="eyebrow" id="gTo">A cinematic Diwali experience</p>
+    <h1 class="title">The Journey<br><em>of Light</em></h1>
+    <p class="sub" id="gSub">One flame. One story. Carry it to the people you love.</p>
+    <button class="btn primary big" id="btnBegin">Light the diya &amp; begin</button>
+    <button class="link" id="btnQuiet">Begin without sound</button>
+    <p class="note">≈ 1 minute · best with sound on 🔊</p>
+    <button class="link small" id="btnSend">Send this to someone you love →</button>
+  </div>
+</section>
+
+<div id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="card">
+    <button class="x" id="mClose" aria-label="Close">×</button>
+    <h2 id="mTitle">Make it personal</h2>
+    <p class="muted">Their name appears in the film and in the link preview.</p>
+    <label>Their name<input id="inTo" maxlength="24" placeholder="e.g. Aarav" autocomplete="off"></label>
+    <label>Your name<input id="inFrom" maxlength="24" placeholder="e.g. Priya" autocomplete="off"></label>
+    <input id="outLink" readonly aria-label="Your link">
+    <div class="actions">
+      <a class="btn primary" id="mWa" target="_blank" rel="noopener">WhatsApp</a>
+      <button class="btn" id="mCopy">Copy link</button>
+      <button class="btn" id="mShare">Share…</button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

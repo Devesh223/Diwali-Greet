@@ -1,0 +1,1 @@
+{ "name": "journey-of-light", "version": "2.0.0", "private": true, "description": "The Journey of Light — a cinematic Diwali experience by Indian Pixel", "scripts": { "start": "node server.js" }, "engines": { "node": ">=18" } }
