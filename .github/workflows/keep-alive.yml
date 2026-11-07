@@ -1,0 +1,22 @@
+name: Keep Alive Cron
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render free tier from spinning down
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual run anytime from GitHub Actions tab
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Service
+        env:
+          # You can set APP_URL in GitHub Repo Settings -> Secrets/Variables -> Actions -> Variables
+          # e.g. https://your-app-name.onrender.com
+          APP_URL: ${{ vars.APP_URL || secrets.APP_URL || 'https://diwali-greet.onrender.com' }}
+        run: |
+          TARGET="${APP_URL%/}/healthz"
+          echo "Pinging $TARGET at $(date -u)"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 45 "$TARGET" || echo "failed")
+          echo "Response HTTP status: $STATUS"

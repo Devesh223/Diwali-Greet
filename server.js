@@ -1,6 +1,6 @@
 // Zero-dependency static server for Render. Injects absolute URLs + personalised
 // OpenGraph tags so WhatsApp / Instagram link previews show "A Diwali wish for <Name>".
-const http = require('http'), fs = require('fs'), path = require('path'), zlib = require('zlib');
+const http = require('http'), https = require('https'), fs = require('fs'), path = require('path'), zlib = require('zlib');
 const PUB = path.join(__dirname, 'public'), PORT = process.env.PORT || 3000;
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.txt': 'text/plain', '.mp3': 'audio/mpeg' };
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -52,4 +52,14 @@ http.createServer((req, res) => {
       res.writeHead(200, h); res.end(data);
     });
   });
-}).listen(PORT, () => console.log('Journey of Light on :' + PORT));
+}).listen(PORT, () => {
+  console.log('Journey of Light on :' + PORT);
+  const extUrl = process.env.RENDER_EXTERNAL_URL || process.env.PING_URL;
+  if (extUrl) {
+    const target = extUrl.replace(/\/$/, '') + '/healthz';
+    const client = target.startsWith('https') ? https : http;
+    setInterval(() => {
+      client.get(target, (res) => res.resume()).on('error', () => {});
+    }, 13 * 60 * 1000);
+  }
+});
